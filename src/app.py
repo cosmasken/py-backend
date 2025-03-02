@@ -8,6 +8,7 @@ from io import BytesIO
 import io
 import cv2
 import os
+import random
 
 app = Flask(__name__)
 CORS(app) # Enable CORS
@@ -38,7 +39,8 @@ def split_image(image, grid_size=(3, 3)):
 @app.route('/generate_captcha', methods=['GET'])
 def generate_captcha():
     # Programmatically select an image from an online source
-    image_url = 'https://oortcaptcha.standard.us-east-1.oortstorage.com/road13.png'
+    image_index = random.randint(0, 786)
+    image_url = f'https://oortcaptcha.standard.us-east-1.oortstorage.com/road{image_index}.png'
     response = requests.get(image_url)
     image = Image.open(BytesIO(response.content))
     image = np.array(image)
@@ -81,24 +83,8 @@ def verify_captcha():
     result = 'Correct' if correct_selections == len(selected_images) else 'Incorrect'
     return jsonify({'result': result})
 
-from web3 import Web3
 
-@app.route('/verify_signature', methods=['POST'])
-def verify_signature():
-    data = request.get_json()
-    message = data['message']
-    signature = data['signature']
-    wallet_address = data['walletAddress']
 
-    web3 = Web3(Web3.HTTPProvider('YOUR_INFURA_OR_ALCHEMY_URL'))
-    message_hash = web3.sha3(text=message)
-    recovered_address = web3.eth.account.recoverHash(message_hash, signature=signature)
-
-    if recovered_address.lower() == wallet_address.lower():
-        # Proceed with funds transfer
-        return jsonify({'result': 'Signature verified'})
-    else:
-        return jsonify({'error': 'Invalid signature'}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
