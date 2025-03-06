@@ -11,13 +11,12 @@ def train_model(images_path, csv_path, epochs=20, batch_size=32):
     images, labels = load_data(images_path, csv_path)
     images = preprocess_data(images)
 
-    # Split data into training and validation sets
     train_images, val_images, train_labels, val_labels = split_data(images, labels, train_size=0.8)
 
     model = create_model(input_shape=(224, 224, 3), num_classes=4)
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-    # Early stopping callback
+
     early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
 
     history = model.fit(train_images, train_labels, epochs=epochs, batch_size=batch_size, validation_data=(val_images, val_labels), callbacks=[early_stopping])

@@ -11,7 +11,7 @@ def load_images(image_dir, annotations):
     for filename in filenames:
         img_path = os.path.join(image_dir, filename)
         if os.path.exists(img_path):
-            image = Image.open(img_path).convert('RGB')  # Convert image to RGB
+            image = Image.open(img_path).convert('RGB') 
             image = image.resize((224, 224))
             image = np.array(image)
             images.append(image)
@@ -37,7 +37,7 @@ def load_annotations_csv(csv_path):
     return annotations
 
 def preprocess_data(images):
-    # Normalize images
+
     images = images / 255.0
     return images
 
@@ -45,7 +45,6 @@ def load_data(image_dir, csv_path):
     annotations = load_annotations_csv(csv_path)
     images = load_images(image_dir, annotations)
     
-    # Define class mapping
     class_mapping = {
         'crosswalk': 0,
         'speedlimit': 1,
@@ -53,10 +52,9 @@ def load_data(image_dir, csv_path):
         'trafficlight': 3
     }
     
-    # Map class names to integers
     labels = [class_mapping[ann['class']] for ann in annotations if os.path.exists(os.path.join(image_dir, ann['filename']))]
     
-    # One-hot encode labels
+
     labels = to_categorical(labels, num_classes=4)
     
     return images, np.array(labels)
